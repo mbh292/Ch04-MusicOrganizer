@@ -1,11 +1,12 @@
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * A class to hold details of audio tracks.
  * Individual tracks may be played.
  * 
- * @author David J. Barnes and Michael Kölling
- * @version 2016.02.29
+ * @author Mustafa Has
+ * @version 2026.10.13
  */
 public class MusicOrganizer
 {
@@ -15,6 +16,8 @@ public class MusicOrganizer
     private MusicPlayer player;
     // A reader that can read music files and load them as tracks.
     private TrackReader reader;
+    // A random number generator, used to pick random tracks.
+    private Random random;
 
     /**
      * Create a MusicOrganizer
@@ -24,6 +27,7 @@ public class MusicOrganizer
         tracks = new ArrayList<>();
         player = new MusicPlayer();
         reader = new TrackReader();
+        random = new Random();
         readLibrary("../audio");
         System.out.println("Music library loaded. " + getNumberOfTracks() + " tracks.");
         System.out.println();
@@ -159,6 +163,45 @@ public class MusicOrganizer
             valid = true;
         }
         return valid;
+    }
+    
+    /**
+     * Play a random track from the collection.
+     * Does nothing if the collection is empty.
+     */
+    public void playRandomTrack()
+    {
+        if(tracks.size() > 0) {
+            int index = random.nextInt(tracks.size());
+            playTrack(index);
+        }
+        else {
+            System.out.println("There are no tracks to play.");
+        }
+    }
+
+    /**
+     * Play every track in the collection exactly once, in random order.
+     * No track is repeated. The original list of tracks is not changed.
+     */
+    public void playAllTracksRandomly()
+    {
+        // Make a copy of the list so we can remove tracks from the copy
+        // without removing them from the real collection.
+        ArrayList<Track> remaining = new ArrayList<>(tracks);
+
+        while(remaining.size() > 0) {
+            // Pick a random position in the copy.
+            int index = random.nextInt(remaining.size());
+
+            // Take that track out of the copy so it can't be picked again.
+            Track track = remaining.remove(index);
+
+            // Announce it and play it.
+            System.out.println("Now playing: " + track.getArtist() + " - " + track.getTitle());
+            player.playSample(track.getFilename());
+        }
+        System.out.println("Finished playing all tracks.");
     }
     
     private void readLibrary(String folderName)
